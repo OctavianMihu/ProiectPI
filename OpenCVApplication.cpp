@@ -5,6 +5,11 @@
 #include "common.h"
 #include <opencv2/core/utils/logger.hpp>
 
+#include <stdio.h>
+#include <windows.h>
+
+#define NUM_CARDS 53
+
 wchar_t* projectPath;
 
 void testOpenImage()
@@ -426,10 +431,123 @@ void showHistogram(const std::string& name, int* hist, const int  hist_cols, con
 	imshow(name, imgHist);
 }
 
+void ListFiles(const TCHAR* dir)
+{
+	WIN32_FIND_DATA info; // file/dir info
+	TCHAR fullPath[MAX_PATH]; //dir path
+	HANDLE hFind = INVALID_HANDLE_VALUE; //operation handle
+	DWORD dwError = 0; //error codes, if any
+
+	_tcscpy_s(fullPath, MAX_PATH, dir);  //strcpy
+	_tcscat_s(fullPath, MAX_PATH, TEXT("\\*"));
+
+	hFind = FindFirstFile(fullPath, &info);
+
+	if (hFind == INVALID_HANDLE_VALUE) {
+		printf("Invalid handle value\n");
+		return;
+	}
+	do {
+		if (_tcscmp(info.cFileName, TEXT(".")) != 0 && _tcscmp(info.cFileName, TEXT("..")) != 0)
+		{
+			if (info.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) {
+				_tprintf("%s directory path");
+			}
+		}
+	} while (1);
+}
+
+
+#include <stdio.h>
+#include <windows.h>
+
+// Structure to store directory names and their corresponding integer values
+typedef struct {
+	char name[MAX_PATH];
+	int value;
+} Directory;
+
+// Function to read cards configuration from file and populate the directory structure
+void readCardsConfig(const char* configFile, Directory* directories) {
+	FILE* file = fopen(configFile, "r");
+	if (file == NULL) {
+		fprintf(stderr, "Error: Unable to open configuration file %s\n", configFile);
+		return;
+	}
+
+	int index = 0;
+	char line[MAX_PATH];
+	while (fgets(line, sizeof(line), file) != NULL) {
+		char* name = strtok(line, "=");
+		char* valueStr = strtok(NULL, "\n");
+		if (name != NULL && valueStr != NULL) {
+			strcpy(directories[index].name, name);
+			directories[index].value = atoi(valueStr);
+			index++;
+		}
+	}
+
+	fclose(file);
+}
+
+// Function to list files in directories and assign integer values to directory names
+void listFiles(const char* path, Directory* directories) {
+	WIN32_FIND_DATAA findData;
+	HANDLE hFind = INVALID_HANDLE_VALUE;
+	char searchPath[MAX_PATH];
+
+	sprintf_s(searchPath, sizeof(searchPath), "%s\\*", path);
+
+	hFind = FindFirstFileA(searchPath, &findData);
+	if (hFind == INVALID_HANDLE_VALUE) {
+		fprintf(stderr, "Error: Unable to find files in directory %s\n", path);
+		return;
+	}
+
+	do {
+		
+		if (strcmp(findData.cFileName, ".") != 0 && strcmp(findData.cFileName, "..") != 0) {
+			
+			if (findData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) {
+
+				for (int i = 0; i < NUM_CARDS; i++) {
+					if (strcmp(findData.cFileName, directories[i].name) == 0) {
+						
+						printf("%s: %d\n", directories[i].name, directories[i].value);
+						break;
+					}
+				}
+			}
+		}
+	} while (FindNextFileA(hFind, &findData) != 0);
+
+	
+	FindClose(hFind);
+}
+
+
 int main() 
 {
+
+	/*const char* path = "C:\\Your\\Directory\\Path";
+	int counter = 0;
+	Directory directories[100]; // Assuming a maximum of 100 directories
+
+	// List files and assign integer values to directory names
+	listFiles(path, &counter, directories);*/
+
 	cv::utils::logging::setLogLevel(cv::utils::logging::LOG_LEVEL_FATAL);
     projectPath = _wgetcwd(0, 0);
+
+	const char* path = "D:\\PI:\\Poze_Project:\\test";
+	const char* configFile = "card_config.txt";
+
+	
+	Directory directories[NUM_CARDS];
+	readCardsConfig(configFile, directories);
+
+
+	listFiles(path, directories);
 
 	int op;
 	do
@@ -449,48 +567,51 @@ int main()
 		printf(" 10 - Edges in a video sequence\n");
 		printf(" 11 - Snap frame from live video\n");
 		printf(" 12 - Mouse callback demo\n");
+		printf(" 13 - Open\n");
 		printf(" 0 - Exit\n\n");
+
 		printf("Option: ");
 		scanf("%d",&op);
 		switch (op)
 		{
-			case 1:
-				testOpenImage();
-				break;
-			case 2:
-				testOpenImagesFld();
-				break;
-			case 3:
-				testNegativeImage();
-				break;
-			case 4:
-				testNegativeImageFast();
-				break;
-			case 5:
-				testColor2Gray();
-				break;
-			case 6:
-				testImageOpenAndSave();
-				break;
-			case 7:
-				testBGR2HSV();
-				break;
-			case 8:
-				testResize();
-				break;
-			case 9:
-				testCanny();
-				break;
-			case 10:
-				testVideoSequence();
-				break;
-			case 11:
-				testSnap();
-				break;
-			case 12:
-				testMouseClick();
-				break;
+		case 1:
+			testOpenImage();
+			break;
+		case 2:
+			testOpenImagesFld();
+			break;
+		case 3:
+			testNegativeImage();
+			break;
+		case 4:
+			testNegativeImageFast();
+			break;
+		case 5:
+			testColor2Gray();
+			break;
+		case 6:
+			testImageOpenAndSave();
+			break;
+		case 7:
+			testBGR2HSV();
+			break;
+		case 8:
+			testResize();
+			break;
+		case 9:
+			testCanny();
+			break;
+		case 10:
+			testVideoSequence();
+			break;
+		case 11:
+			testSnap();
+			break;
+		case 12:
+			testMouseClick();
+			break;
 		}
+		
 	}
 	while (op!=0);
 	return 0;

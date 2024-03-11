@@ -1,0 +1,9 @@
+﻿  OpenCVApplication.cpp
+D:\PI\Proiect\ProiectPI\OpenCVApplication.cpp(454,14): warning C4473: 'printf' : not enough arguments passed for format string
+D:\PI\Proiect\ProiectPI\OpenCVApplication.cpp(454,14): message : placeholders and their parameters expect 1 variadic arguments, but 0 were provided
+D:\PI\Proiect\ProiectPI\OpenCVApplication.cpp(454,14): message : the missing variadic argument 1 is required by format string '%s'
+  OpenCVApplication.vcxproj -> D:\PI\Proiect\ProiectPI\x64\Debug\OpenCVApplication.exe
+  OpenCV\dll\Debug\opencv_videoio_ffmpeg490_64.dll
+  OpenCV\dll\Debug\opencv_videoio_msmf490_64d.dll
+  OpenCV\dll\Debug\opencv_world490d.dll
+          3 file(s) copied.
