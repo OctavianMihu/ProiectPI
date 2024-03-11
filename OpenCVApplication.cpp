@@ -532,12 +532,7 @@ void listFiles(const char* path, Directory* directories) {
 }
 
 
-/*
-#include <stdio.h>
-#include <windows.h>
-#include <tchar.h>
-
-void ListFiles(const TCHAR* dir)
+void batchOpen(const TCHAR* dir)
 {
 	WIN32_FIND_DATA ffd;
 	TCHAR szDir[MAX_PATH];
@@ -559,18 +554,20 @@ void ListFiles(const TCHAR* dir)
 	{
 		if (_tcscmp(ffd.cFileName, TEXT(".")) != 0 && _tcscmp(ffd.cFileName, TEXT("..")) != 0)
 		{
+			TCHAR subdir[MAX_PATH];
+			_tcscpy_s(subdir, MAX_PATH, dir);
+			_tcscat_s(subdir, MAX_PATH, TEXT("\\"));
+			_tcscat_s(subdir, MAX_PATH, ffd.cFileName);
 			if (ffd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
-			{
+			{		
 				_tprintf(TEXT("Directory: %s\n"), ffd.cFileName);
-				TCHAR subdir[MAX_PATH];
-				_tcscpy_s(subdir, MAX_PATH, dir);
-				_tcscat_s(subdir, MAX_PATH, TEXT("\\"));
-				_tcscat_s(subdir, MAX_PATH, ffd.cFileName);
-				ListFiles(subdir);
+				batchOpen(subdir);
 			}
 			else
 			{
-				_tprintf(TEXT("File: %s\n"), ffd.cFileName);
+				if (strstr(ffd.cFileName, ".jpg")){
+					imread(subdir);
+				}
 			}
 		}
 	} while (FindNextFile(hFind, &ffd) != 0);
@@ -584,12 +581,6 @@ void ListFiles(const TCHAR* dir)
 	FindClose(hFind);
 }
 
-int main()
-{
-	TCHAR dir[MAX_PATH] = _T("C:\\YourDirectoryPath");
-	ListFiles(dir);
-	return 0;
-}*/
 
 
 
@@ -677,6 +668,9 @@ int main()
 			break;
 		case 12:
 			testMouseClick();
+			break;
+		case 13:
+			batchOpen(getenv("PI_Images"));
 			break;
 		}
 
