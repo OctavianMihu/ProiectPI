@@ -1,9 +1,9 @@
 {
   "Version": 1,
-  "WorkspaceRootPath": "C:\\Users\\Octavian\\Desktop\\PI\\ProiectPI\\",
+  "WorkspaceRootPath": "C:\\Users\\Octavian\\Desktop\\PI\\ProiectPI\\ProiectPI\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{32A91DE2-9143-4739-B125-240F7165D21B}|OpenCVApplication.vcxproj|C:\\Users\\Octavian\\Desktop\\PI\\ProiectPI\\OpenCVApplication.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
+      "AbsoluteMoniker": "D:0:0:{32A91DE2-9143-4739-B125-240F7165D21B}|OpenCVApplication.vcxproj|C:\\Users\\Octavian\\Desktop\\PI\\ProiectPI\\ProiectPI\\OpenCVApplication.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
       "RelativeMoniker": "D:0:0:{32A91DE2-9143-4739-B125-240F7165D21B}|OpenCVApplication.vcxproj|solutionrelative:OpenCVApplication.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
     }
   ],
@@ -20,11 +20,11 @@
               "$type": "Document",
               "DocumentIndex": 0,
               "Title": "OpenCVApplication.cpp",
-              "DocumentMoniker": "C:\\Users\\Octavian\\Desktop\\PI\\ProiectPI\\OpenCVApplication.cpp",
+              "DocumentMoniker": "C:\\Users\\Octavian\\Desktop\\PI\\ProiectPI\\ProiectPI\\OpenCVApplication.cpp",
               "RelativeDocumentMoniker": "OpenCVApplication.cpp",
-              "ToolTip": "C:\\Users\\Octavian\\Desktop\\PI\\ProiectPI\\OpenCVApplication.cpp",
+              "ToolTip": "C:\\Users\\Octavian\\Desktop\\PI\\ProiectPI\\ProiectPI\\OpenCVApplication.cpp",
               "RelativeToolTip": "OpenCVApplication.cpp",
-              "ViewState": "AQIAAJsBAAAAAAAAAAAcwMsBAAABAAAA",
+              "ViewState": "AQIAAEcCAAAAAAAAAAAqwKYCAAAUAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000677|",
               "WhenOpened": "2024-03-07T13:55:00.174Z",
               "EditorCaption": ""

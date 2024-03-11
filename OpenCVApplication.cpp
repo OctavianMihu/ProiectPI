@@ -20,11 +20,11 @@ wchar_t* projectPath;
 void testOpenImage()
 {
 	char fname[MAX_PATH];
-	while(openFileDlg(fname))
+	while (openFileDlg(fname))
 	{
 		Mat src;
 		src = imread(fname);
-		imshow("image",src);
+		imshow("image", src);
 		waitKey();
 	}
 }
@@ -32,16 +32,16 @@ void testOpenImage()
 void testOpenImagesFld()
 {
 	char folderName[MAX_PATH];
-	if (openFolderDlg(folderName)==0)
+	if (openFolderDlg(folderName) == 0)
 		return;
 	char fname[MAX_PATH];
-	FileGetter fg(folderName,"bmp");
-	while(fg.getNextAbsFile(fname))
+	FileGetter fg(folderName, "bmp");
+	while (fg.getNextAbsFile(fname))
 	{
 		Mat src;
 		src = imread(fname);
-		imshow(fg.getFoundFileName(),src);
-		if (waitKey()==27) //ESC pressed
+		imshow(fg.getFoundFileName(), src);
+		if (waitKey() == 27) //ESC pressed
 			break;
 	}
 }
@@ -85,23 +85,23 @@ void testImageOpenAndSave()
 void testNegativeImage()
 {
 	char fname[MAX_PATH];
-	while(openFileDlg(fname))
+	while (openFileDlg(fname))
 	{
 		double t = (double)getTickCount(); // Get the current time [s]
-		
-		Mat src = imread(fname,IMREAD_GRAYSCALE);
+
+		Mat src = imread(fname, IMREAD_GRAYSCALE);
 		int height = src.rows;
 		int width = src.cols;
-		Mat dst = Mat(height,width,CV_8UC1);
+		Mat dst = Mat(height, width, CV_8UC1);
 		// Accessing individual pixels in an 8 bits/pixel image
 		// Inefficient way -> slow
-		for (int i=0; i<height; i++)
+		for (int i = 0; i < height; i++)
 		{
-			for (int j=0; j<width; j++)
+			for (int j = 0; j < width; j++)
 			{
-				uchar val = src.at<uchar>(i,j);
+				uchar val = src.at<uchar>(i, j);
 				uchar neg = 255 - val;
-				dst.at<uchar>(i,j) = neg;
+				dst.at<uchar>(i, j) = neg;
 			}
 		}
 
@@ -110,8 +110,8 @@ void testNegativeImage()
 		// Print (in the console window) the processing time in [ms] 
 		printf("Time = %.3f [ms]\n", t * 1000);
 
-		imshow("input image",src);
-		imshow("negative image",dst);
+		imshow("input image", src);
+		imshow("negative image", dst);
 		waitKey();
 	}
 }
@@ -129,13 +129,13 @@ void testNegativeImageFast()
 		double t = (double)getTickCount(); // Get the current time [s]
 
 		// The fastest approach of accessing the pixels -> using pointers
-		uchar *lpSrc = src.data;
-		uchar *lpDst = dst.data;
-		int w = (int) src.step; // no dword alignment is done !!!
-		for (int i = 0; i<height; i++)
+		uchar* lpSrc = src.data;
+		uchar* lpDst = dst.data;
+		int w = (int)src.step; // no dword alignment is done !!!
+		for (int i = 0; i < height; i++)
 			for (int j = 0; j < width; j++) {
-				uchar val = lpSrc[i*w + j];
-				lpDst[i*w + j] = 255 - val;
+				uchar val = lpSrc[i * w + j];
+				lpDst[i * w + j] = 255 - val;
 			}
 
 		// Get the current time again and compute the time difference [s]
@@ -143,8 +143,8 @@ void testNegativeImageFast()
 		// Print (in the console window) the processing time in [ms] 
 		printf("Time = %.3f [ms]\n", t * 1000);
 
-		imshow("input image",src);
-		imshow("negative image",dst);
+		imshow("input image", src);
+		imshow("negative image", dst);
 		waitKey();
 	}
 }
@@ -152,31 +152,31 @@ void testNegativeImageFast()
 void testColor2Gray()
 {
 	char fname[MAX_PATH];
-	while(openFileDlg(fname))
+	while (openFileDlg(fname))
 	{
 		Mat src = imread(fname);
 
 		int height = src.rows;
 		int width = src.cols;
 
-		Mat dst = Mat(height,width,CV_8UC1);
+		Mat dst = Mat(height, width, CV_8UC1);
 
 		// Accessing individual pixels in a RGB 24 bits/pixel image
 		// Inefficient way -> slow
-		for (int i=0; i<height; i++)
+		for (int i = 0; i < height; i++)
 		{
-			for (int j=0; j<width; j++)
+			for (int j = 0; j < width; j++)
 			{
-				Vec3b v3 = src.at<Vec3b>(i,j);
+				Vec3b v3 = src.at<Vec3b>(i, j);
 				uchar b = v3[0];
 				uchar g = v3[1];
 				uchar r = v3[2];
-				dst.at<uchar>(i,j) = (r+g+b)/3;
+				dst.at<uchar>(i, j) = (r + g + b) / 3;
 			}
 		}
-		
-		imshow("input image",src);
-		imshow("gray image",dst);
+
+		imshow("input image", src);
+		imshow("gray image", dst);
 		waitKey();
 	}
 }
@@ -206,12 +206,12 @@ void testBGR2HSV()
 		// Defining the pointer to the HSV image matrix (24 bits/pixel)
 		uchar* hsvDataPtr = hsvImg.data;
 
-		for (int i = 0; i<height; i++)
+		for (int i = 0; i < height; i++)
 		{
-			for (int j = 0; j<width; j++)
+			for (int j = 0; j < width; j++)
 			{
-				int hi = i*width * 3 + j * 3;
-				int gi = i*width + j;
+				int hi = i * width * 3 + j * 3;
+				int gi = i * width + j;
 
 				lpH[gi] = hsvDataPtr[hi] * 510 / 360;	// lpH = 0 .. 255
 				lpS[gi] = hsvDataPtr[hi + 1];			// lpS = 0 .. 255
@@ -231,18 +231,18 @@ void testBGR2HSV()
 void testResize()
 {
 	char fname[MAX_PATH];
-	while(openFileDlg(fname))
+	while (openFileDlg(fname))
 	{
 		Mat src;
 		src = imread(fname);
-		Mat dst1,dst2;
+		Mat dst1, dst2;
 		//without interpolation
-		resizeImg(src,dst1,320,false);
+		resizeImg(src, dst1, 320, false);
 		//with interpolation
-		resizeImg(src,dst2,320,true);
-		imshow("input image",src);
-		imshow("resized image (without interpolation)",dst1);
-		imshow("resized image (with interpolation)",dst2);
+		resizeImg(src, dst2, 320, true);
+		imshow("input image", src);
+		imshow("resized image (without interpolation)", dst1);
+		imshow("resized image (with interpolation)", dst2);
 		waitKey();
 	}
 }
@@ -250,17 +250,17 @@ void testResize()
 void testCanny()
 {
 	char fname[MAX_PATH];
-	while(openFileDlg(fname))
+	while (openFileDlg(fname))
 	{
-		Mat src,dst,gauss;
-		src = imread(fname,IMREAD_GRAYSCALE);
+		Mat src, dst, gauss;
+		src = imread(fname, IMREAD_GRAYSCALE);
 		double k = 0.4;
 		int pH = 50;
-		int pL = (int) k*pH;
+		int pL = (int)k * pH;
 		GaussianBlur(src, gauss, Size(5, 5), 0.8, 0.8);
-		Canny(gauss,dst,pL,pH,3);
-		imshow("input image",src);
-		imshow("canny",dst);
+		Canny(gauss, dst, pL, pH, 3);
+		imshow("input image", src);
+		imshow("canny", dst);
 		waitKey();
 	}
 }
@@ -276,7 +276,7 @@ void testVideoSequence()
 		waitKey(0);
 		return;
 	}
-		
+
 	Mat edges;
 	Mat frame;
 	char c;
@@ -285,14 +285,14 @@ void testVideoSequence()
 	{
 		Mat grayFrame;
 		cvtColor(frame, grayFrame, COLOR_BGR2GRAY);
-		Canny(grayFrame,edges,40,100,3);
+		Canny(grayFrame, edges, 40, 100, 3);
 		imshow("source", frame);
 		imshow("gray", grayFrame);
 		imshow("edges", edges);
 		c = waitKey(100);  // waits 100ms and advances to the next frame
 		if (c == 27) {
 			// press ESC to exit
-			printf("ESC pressed - capture finished\n"); 
+			printf("ESC pressed - capture finished\n");
 			break;  //ESC pressed
 		};
 	}
@@ -313,7 +313,7 @@ void testSnap()
 	Mat frame;
 	char numberStr[256];
 	char fileName[256];
-	
+
 	// video resolution
 	Size capS = Size((int)cap.get(CAP_PROP_FRAME_WIDTH),
 		(int)cap.get(CAP_PROP_FRAME_HEIGHT));
@@ -341,7 +341,7 @@ void testSnap()
 		}
 
 		++frameNum;
-		
+
 		imshow(WIN_SRC, frame);
 
 		c = waitKey(10);  // waits a key press to advance to the next frame
@@ -350,7 +350,7 @@ void testSnap()
 			printf("ESC pressed - capture finished");
 			break;  //ESC pressed
 		}
-		if (c == 115){ //'s' pressed - snap the image to a file
+		if (c == 115) { //'s' pressed - snap the image to a file
 			frameCount++;
 			fileName[0] = NULL;
 			sprintf(numberStr, "%d", frameCount);
@@ -358,7 +358,7 @@ void testSnap()
 			strcat(fileName, numberStr);
 			strcat(fileName, ".bmp");
 			bool bSuccess = imwrite(fileName, frame);
-			if (!bSuccess) 
+			if (!bSuccess)
 			{
 				printf("Error writing the snapped image\n");
 			}
@@ -374,13 +374,13 @@ void MyCallBackFunc(int event, int x, int y, int flags, void* param)
 	//More examples: http://opencvexamples.blogspot.com/2014/01/detect-mouse-clicks-and-moves-on-image.html
 	Mat* src = (Mat*)param;
 	if (event == EVENT_LBUTTONDOWN)
-		{
-			printf("Pos(x,y): %d,%d  Color(RGB): %d,%d,%d\n",
-				x, y,
-				(int)(*src).at<Vec3b>(y, x)[2],
-				(int)(*src).at<Vec3b>(y, x)[1],
-				(int)(*src).at<Vec3b>(y, x)[0]);
-		}
+	{
+		printf("Pos(x,y): %d,%d  Color(RGB): %d,%d,%d\n",
+			x, y,
+			(int)(*src).at<Vec3b>(y, x)[2],
+			(int)(*src).at<Vec3b>(y, x)[1],
+			(int)(*src).at<Vec3b>(y, x)[0]);
+	}
 }
 
 void testMouseClick()
@@ -416,14 +416,14 @@ showHistogram ("MyHist", hist_dir, 255, 200);
 */
 void showHistogram(const std::string& name, int* hist, const int  hist_cols, const int hist_height)
 {
-	
+
 	Mat imgHist(hist_height, hist_cols, CV_8UC3, CV_RGB(255, 255, 255)); // constructs a white image
 
 	//computes histogram maximum
 	int max_hist = 0;
-	for (int i = 0; i<hist_cols; i++)
-	if (hist[i] > max_hist)
-		max_hist = hist[i];
+	for (int i = 0; i < hist_cols; i++)
+		if (hist[i] > max_hist)
+			max_hist = hist[i];
 	double scale = 1.0;
 	scale = (double)hist_height / max_hist;
 	int baseline = hist_height - 1;
@@ -436,11 +436,6 @@ void showHistogram(const std::string& name, int* hist, const int  hist_cols, con
 
 	imshow(name, imgHist);
 }
-
-<<<<<<< HEAD
-=======
-
->>>>>>> 9c30d134539594b446cb6398a2a887444bc4f1c5
 void ListFiles(const TCHAR* dir)
 {
 	WIN32_FIND_DATA info; // file/dir info
@@ -466,7 +461,7 @@ void ListFiles(const TCHAR* dir)
 		}
 	} while (1);
 }
-<<<<<<< HEAD
+
 
 
 #include <stdio.h>
@@ -516,14 +511,14 @@ void listFiles(const char* path, Directory* directories) {
 	}
 
 	do {
-		
+
 		if (strcmp(findData.cFileName, ".") != 0 && strcmp(findData.cFileName, "..") != 0) {
-			
+
 			if (findData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) {
 
 				for (int i = 0; i < NUM_CARDS; i++) {
 					if (strcmp(findData.cFileName, directories[i].name) == 0) {
-						
+
 						printf("%s: %d\n", directories[i].name, directories[i].value);
 						break;
 					}
@@ -532,11 +527,11 @@ void listFiles(const char* path, Directory* directories) {
 		}
 	} while (FindNextFileA(hFind, &findData) != 0);
 
-	
+
 	FindClose(hFind);
 }
 
-=======
+
 /*
 #include <stdio.h>
 #include <windows.h>
@@ -596,9 +591,9 @@ int main()
 	return 0;
 }*/
 
->>>>>>> 9c30d134539594b446cb6398a2a887444bc4f1c5
 
-int main() 
+
+int main()
 {
 
 	/*const char* path = "C:\\Your\\Directory\\Path";
@@ -609,12 +604,12 @@ int main()
 	listFiles(path, &counter, directories);*/
 
 	cv::utils::logging::setLogLevel(cv::utils::logging::LOG_LEVEL_FATAL);
-    projectPath = _wgetcwd(0, 0);
+	projectPath = _wgetcwd(0, 0);
 
 	const char* path = "D:\\PI:\\Poze_Project:\\test";
 	const char* configFile = "card_config.txt";
 
-	
+
 	Directory directories[NUM_CARDS];
 	readCardsConfig(configFile, directories);
 
@@ -643,10 +638,10 @@ int main()
 		printf(" 0 - Exit\n\n");
 
 		printf("Option: ");
-		scanf("%d",&op);
+		scanf("%d", &op);
 		switch (op)
 		{
-<<<<<<< HEAD
+
 		case 1:
 			testOpenImage();
 			break;
@@ -683,50 +678,8 @@ int main()
 		case 12:
 			testMouseClick();
 			break;
-=======
-			case 1:
-				testOpenImage();
-				break;
-			case 2:
-				testOpenImagesFld();
-				break;
-			case 3:
-				testNegativeImage();
-				break;
-			case 4:
-				testNegativeImageFast();
-				break;
-			case 5:
-				testColor2Gray();
-				break;
-			case 6:
-				testImageOpenAndSave();
-				break;
-			case 7:
-				testBGR2HSV();
-				break;
-			case 8:
-				testResize();
-				break;
-			case 9:
-				testCanny();
-				break;
-			case 10:
-				testVideoSequence();
-				break;
-			case 11:
-				testSnap();
-				break;
-			case 12:
-				testMouseClick();
-				break;
-			case 13:
-				openImages();
-				break;
->>>>>>> 9c30d134539594b446cb6398a2a887444bc4f1c5
 		}
-		
-	}
-	while (op!=0);
+
+	} while (op != 0);
 	return 0;
 }
