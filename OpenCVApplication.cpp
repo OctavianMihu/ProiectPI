@@ -2,8 +2,13 @@
 //
 
 #include "stdafx.h"
+#include <stdlib.h>
 #include "common.h"
 #include <opencv2/core/utils/logger.hpp>
+#include <stdio.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <Windows.h>
 
 #include <stdio.h>
 #include <windows.h>
@@ -411,6 +416,7 @@ showHistogram ("MyHist", hist_dir, 255, 200);
 */
 void showHistogram(const std::string& name, int* hist, const int  hist_cols, const int hist_height)
 {
+	
 	Mat imgHist(hist_height, hist_cols, CV_8UC3, CV_RGB(255, 255, 255)); // constructs a white image
 
 	//computes histogram maximum
@@ -431,6 +437,10 @@ void showHistogram(const std::string& name, int* hist, const int  hist_cols, con
 	imshow(name, imgHist);
 }
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> 9c30d134539594b446cb6398a2a887444bc4f1c5
 void ListFiles(const TCHAR* dir)
 {
 	WIN32_FIND_DATA info; // file/dir info
@@ -456,6 +466,7 @@ void ListFiles(const TCHAR* dir)
 		}
 	} while (1);
 }
+<<<<<<< HEAD
 
 
 #include <stdio.h>
@@ -525,6 +536,67 @@ void listFiles(const char* path, Directory* directories) {
 	FindClose(hFind);
 }
 
+=======
+/*
+#include <stdio.h>
+#include <windows.h>
+#include <tchar.h>
+
+void ListFiles(const TCHAR* dir)
+{
+	WIN32_FIND_DATA ffd;
+	TCHAR szDir[MAX_PATH];
+	HANDLE hFind = INVALID_HANDLE_VALUE;
+	DWORD dwError = 0;
+
+	_tcscpy_s(szDir, MAX_PATH, dir);
+	_tcscat_s(szDir, MAX_PATH, TEXT("\\*"));
+
+	hFind = FindFirstFile(szDir, &ffd);
+
+	if (hFind == INVALID_HANDLE_VALUE)
+	{
+		printf("Invalid handle value\n");
+		return;
+	}
+
+	do
+	{
+		if (_tcscmp(ffd.cFileName, TEXT(".")) != 0 && _tcscmp(ffd.cFileName, TEXT("..")) != 0)
+		{
+			if (ffd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
+			{
+				_tprintf(TEXT("Directory: %s\n"), ffd.cFileName);
+				TCHAR subdir[MAX_PATH];
+				_tcscpy_s(subdir, MAX_PATH, dir);
+				_tcscat_s(subdir, MAX_PATH, TEXT("\\"));
+				_tcscat_s(subdir, MAX_PATH, ffd.cFileName);
+				ListFiles(subdir);
+			}
+			else
+			{
+				_tprintf(TEXT("File: %s\n"), ffd.cFileName);
+			}
+		}
+	} while (FindNextFile(hFind, &ffd) != 0);
+
+	dwError = GetLastError();
+	if (dwError != ERROR_NO_MORE_FILES)
+	{
+		printf("FindNextFile error: %d\n", dwError);
+	}
+
+	FindClose(hFind);
+}
+
+int main()
+{
+	TCHAR dir[MAX_PATH] = _T("C:\\YourDirectoryPath");
+	ListFiles(dir);
+	return 0;
+}*/
+
+>>>>>>> 9c30d134539594b446cb6398a2a887444bc4f1c5
 
 int main() 
 {
@@ -574,6 +646,7 @@ int main()
 		scanf("%d",&op);
 		switch (op)
 		{
+<<<<<<< HEAD
 		case 1:
 			testOpenImage();
 			break;
@@ -610,6 +683,47 @@ int main()
 		case 12:
 			testMouseClick();
 			break;
+=======
+			case 1:
+				testOpenImage();
+				break;
+			case 2:
+				testOpenImagesFld();
+				break;
+			case 3:
+				testNegativeImage();
+				break;
+			case 4:
+				testNegativeImageFast();
+				break;
+			case 5:
+				testColor2Gray();
+				break;
+			case 6:
+				testImageOpenAndSave();
+				break;
+			case 7:
+				testBGR2HSV();
+				break;
+			case 8:
+				testResize();
+				break;
+			case 9:
+				testCanny();
+				break;
+			case 10:
+				testVideoSequence();
+				break;
+			case 11:
+				testSnap();
+				break;
+			case 12:
+				testMouseClick();
+				break;
+			case 13:
+				openImages();
+				break;
+>>>>>>> 9c30d134539594b446cb6398a2a887444bc4f1c5
 		}
 		
 	}
