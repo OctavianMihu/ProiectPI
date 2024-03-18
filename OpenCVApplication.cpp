@@ -9,11 +9,13 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <Windows.h>
-
+#include <string.h>
 #include <stdio.h>
 #include <windows.h>
 
-#define NUM_CARDS 53
+#define MAX_LINE_LENGTH 256
+#define NUM_TAGS 4
+
 
 wchar_t* projectPath;
 
@@ -462,75 +464,90 @@ void ListFiles(const TCHAR* dir)
 	} while (1);
 }
 
-
-
-#include <stdio.h>
-#include <windows.h>
-
-// Structure to store directory names and their corresponding integer values
+/*
 typedef struct {
-	char name[MAX_PATH];
-	int value;
-} Directory;
+	int number;
+	char tag[MAX_LINE_LENGTH];
+} TagNumber;
 
-// Function to read cards configuration from file and populate the directory structure
-void readCardsConfig(const char* configFile, Directory* directories) {
-	FILE* file = fopen(configFile, "r");
+
+void assignTag(int number, char* tag) {
+	char* tags[NUM_TAGS] = { "Clubs", "Diamonds", "Hearts", "Spades" };
+
+	
+	if (number == 0 || number == 4 || number == 8 || number == 12 || number == 16 || number == 21 || number == 25 || number == 29 || number == 33 || number == 37 || number == 41
+		|| number == 45 || number == 49){
+		strcpy(tag, tags[0]); // Clubs
+	}
+	else if (number == 1 || number == 5 || number == 9 || number == 13 || number == 17 || number == 22 || number == 26 || number == 20 || number == 34 || number == 38 || number == 42
+		|| number == 46 || number == 50) {
+		strcpy(tag, tags[1]); // Diamonds
+	}
+	else if (number == 2 || number == 6 || number == 10 || number == 14 || number == 18 || number == 23 || number == 27 || number == 31 || number == 35 || number == 39 || number == 43
+		|| number == 47 || number == 51) {
+		strcpy(tag, tags[2]); // Hearts
+	}
+	else if (number == 3 || number == 7 || number == 11 || number == 15 || number == 19 || number == 24 || number == 28 || number == 32 || number == 36 || number == 40 || number == 44
+		|| number == 48 || number == 52) {
+		strcpy(tag, tags[3]); // Spades
+	}
+	else {
+		strcpy(tag, "Unknown");
+	}
+}
+
+void processDataFromFile(const char* filename) {
+	FILE* file = fopen(filename, "r");
 	if (file == NULL) {
-		fprintf(stderr, "Error: Unable to open configuration file %s\n", configFile);
+		fprintf(stderr, "Error: Unable to open file\n");
 		return;
 	}
 
-	int index = 0;
-	char line[MAX_PATH];
+	TagNumber* tagNumbers = (TagNumber*)malloc(NUM_TAGS * sizeof(TagNumber));
+	if (tagNumbers == NULL) {
+		fprintf(stderr, "Error: Memory allocation failed\n");
+		fclose(file);
+		return;
+	}
+
+
+	char line[MAX_LINE_LENGTH];
+	int count = 0;
+	fgets(line, sizeof(line), file);
 	while (fgets(line, sizeof(line), file) != NULL) {
-		char* name = strtok(line, "=");
-		char* valueStr = strtok(NULL, "\n");
-		if (name != NULL && valueStr != NULL) {
-			strcpy(directories[index].name, name);
-			directories[index].value = atoi(valueStr);
-			index++;
-		}
+		
+		int number;
+		sscanf(line, "%d", &number);
+
+		
+		assignTag(number, tagNumbers[count].tag);
+
+		// Store the number and tag in the array
+		tagNumbers[count].number = number;
+		count++;
 	}
 
+	
 	fclose(file);
-}
 
-// Function to list files in directories and assign integer values to directory names
-void listFiles(const char* path, Directory* directories) {
-	WIN32_FIND_DATAA findData;
-	HANDLE hFind = INVALID_HANDLE_VALUE;
-	char searchPath[MAX_PATH];
-
-	sprintf_s(searchPath, sizeof(searchPath), "%s\\*", path);
-
-	hFind = FindFirstFileA(searchPath, &findData);
-	if (hFind == INVALID_HANDLE_VALUE) {
-		fprintf(stderr, "Error: Unable to find files in directory %s\n", path);
-		return;
+	
+	printf("Tags and their corresponding numbers:\n");
+	for (int i = 0; i < count; i++) {
+		printf("Number: %d, Tag: %s\n", tagNumbers[i].number, tagNumbers[i].tag);
 	}
 
-	do {
-
-		if (strcmp(findData.cFileName, ".") != 0 && strcmp(findData.cFileName, "..") != 0) {
-
-			if (findData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) {
-
-				for (int i = 0; i < NUM_CARDS; i++) {
-					if (strcmp(findData.cFileName, directories[i].name) == 0) {
-
-						printf("%s: %d\n", directories[i].name, directories[i].value);
-						break;
-					}
-				}
-			}
-		}
-	} while (FindNextFileA(hFind, &findData) != 0);
-
-
-	FindClose(hFind);
+	
+	//free (tagNumbers);
 }
+*/
+typedef struct {
+	int tag;
+	Mat mat;
+}image;
 
+int count = 0;
+
+std::vector<image> images;
 
 void batchOpen(const TCHAR* dir)
 {
@@ -560,14 +577,34 @@ void batchOpen(const TCHAR* dir)
 			_tcscat_s(subdir, MAX_PATH, ffd.cFileName);
 			if (ffd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
 			{		
-				_tprintf(TEXT("Directory: %s\n"), ffd.cFileName);
+				//_tprintf(TEXT("Directory: %s\n"), ffd.cFileName);
 				batchOpen(subdir);
 			}
 			else
 			{
+				image img;
 				if (strstr(ffd.cFileName, ".jpg")){
-					imread(subdir);
+					count++;
+					img.mat = imread(subdir);
+					image img;
+					if (strstr(dir, "clubs")) {
+						img.tag = 0;
+						printf("%s %d\n", dir, img.tag);
+					}else
+					if (strstr(dir, "diamonds")) {
+						img.tag = 1;
+						printf("%s %d\n", dir, img.tag);
+					}else
+					if (strstr(dir, "spades")) {
+						img.tag = 2;
+						printf("%s %d\n", dir, img.tag);
+					}else
+					if (strstr(dir, "heart")) {
+						img.tag = 3;
+						printf("%s %d\n", dir, img.tag);
+					}
 				}
+				images.push_back(img);
 			}
 		}
 	} while (FindNextFile(hFind, &ffd) != 0);
@@ -577,8 +614,9 @@ void batchOpen(const TCHAR* dir)
 	{
 		printf("FindNextFile error: %d\n", dwError);
 	}
-
+	
 	FindClose(hFind);
+
 }
 
 
@@ -596,16 +634,6 @@ int main()
 
 	cv::utils::logging::setLogLevel(cv::utils::logging::LOG_LEVEL_FATAL);
 	projectPath = _wgetcwd(0, 0);
-
-	const char* path = "D:\\PI:\\Poze_Project:\\test";
-	const char* configFile = "card_config.txt";
-
-
-	Directory directories[NUM_CARDS];
-	readCardsConfig(configFile, directories);
-
-
-	listFiles(path, directories);
 
 	int op;
 	do
@@ -671,6 +699,8 @@ int main()
 			break;
 		case 13:
 			batchOpen(getenv("PI_Images"));
+			FILE* file = fopen("poze.txt", "w");
+			fprintf(file, "Numarul de poze la care am dat tag:%d\n", count);
 			break;
 		}
 
