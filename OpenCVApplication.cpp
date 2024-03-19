@@ -12,6 +12,7 @@
 #include <string.h>
 #include <stdio.h>
 #include <windows.h>
+#include <iostream>
 
 #define MAX_LINE_LENGTH 256
 #define NUM_TAGS 4
@@ -474,7 +475,7 @@ typedef struct {
 void assignTag(int number, char* tag) {
 	char* tags[NUM_TAGS] = { "Clubs", "Diamonds", "Hearts", "Spades" };
 
-	
+
 	if (number == 0 || number == 4 || number == 8 || number == 12 || number == 16 || number == 21 || number == 25 || number == 29 || number == 33 || number == 37 || number == 41
 		|| number == 45 || number == 49){
 		strcpy(tag, tags[0]); // Clubs
@@ -515,11 +516,11 @@ void processDataFromFile(const char* filename) {
 	int count = 0;
 	fgets(line, sizeof(line), file);
 	while (fgets(line, sizeof(line), file) != NULL) {
-		
+
 		int number;
 		sscanf(line, "%d", &number);
 
-		
+
 		assignTag(number, tagNumbers[count].tag);
 
 		// Store the number and tag in the array
@@ -527,16 +528,16 @@ void processDataFromFile(const char* filename) {
 		count++;
 	}
 
-	
+
 	fclose(file);
 
-	
+
 	printf("Tags and their corresponding numbers:\n");
 	for (int i = 0; i < count; i++) {
 		printf("Number: %d, Tag: %s\n", tagNumbers[i].number, tagNumbers[i].tag);
 	}
 
-	
+
 	//free (tagNumbers);
 }
 */
@@ -547,7 +548,11 @@ typedef struct {
 
 int count = 0;
 
-std::vector<image> images;
+std::vector<image> test_images;
+std::vector<image> train_images;
+
+std::vector<int> test_images_tag;
+std::vector<int> train_images_tag;
 
 void batchOpen(const TCHAR* dir)
 {
@@ -576,35 +581,47 @@ void batchOpen(const TCHAR* dir)
 			_tcscat_s(subdir, MAX_PATH, TEXT("\\"));
 			_tcscat_s(subdir, MAX_PATH, ffd.cFileName);
 			if (ffd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
-			{		
+			{
 				//_tprintf(TEXT("Directory: %s\n"), ffd.cFileName);
 				batchOpen(subdir);
 			}
 			else
 			{
 				image img;
-				if (strstr(ffd.cFileName, ".jpg")){
+				if (strstr(ffd.cFileName, ".jpg")) {
 					count++;
 					img.mat = imread(subdir);
 					image img;
 					if (strstr(dir, "clubs")) {
 						img.tag = 0;
-						printf("%s %d\n", dir, img.tag);
-					}else
-					if (strstr(dir, "diamonds")) {
-						img.tag = 1;
-						printf("%s %d\n", dir, img.tag);
-					}else
-					if (strstr(dir, "spades")) {
-						img.tag = 2;
-						printf("%s %d\n", dir, img.tag);
-					}else
-					if (strstr(dir, "heart")) {
-						img.tag = 3;
-						printf("%s %d\n", dir, img.tag);
+						//printf("%s %d\n", dir, img.tag);
+					}
+					else
+						if (strstr(dir, "diamonds")) {
+							img.tag = 1;
+							//printf("%s %d\n", dir, img.tag);
+						}
+						else
+							if (strstr(dir, "spades")) {
+								img.tag = 2;
+								//printf("%s %d\n", dir, img.tag);
+							}
+							else
+								if (strstr(dir, "heart")) {
+									img.tag = 3;
+									//printf("%s %d\n", dir, img.tag);
+								}
+					if (strstr(dir, "test")) {
+						test_images.push_back(img);
+						test_images_tag.push_back(img.tag);
+					}
+					else {
+
+						train_images.push_back(img);
+						train_images_tag.push_back(img.tag);
 					}
 				}
-				images.push_back(img);
+
 			}
 		}
 	} while (FindNextFile(hFind, &ffd) != 0);
@@ -614,12 +631,76 @@ void batchOpen(const TCHAR* dir)
 	{
 		printf("FindNextFile error: %d\n", dwError);
 	}
-	
+
 	FindClose(hFind);
 
 }
 
+int generate_random_label(Mat image) {
+	return rand() % 4;
+}
 
+int test_generare_random()
+{
+	char fname[MAX_PATH];
+	Mat src;
+	while (openFileDlg(fname))
+	{
+
+		src = imread(fname);
+		imshow("image", src);
+		if (src.empty()) {
+			printf("Imaginea nu a putut fi incarcata.\n");
+			return -1;
+		}
+
+
+		int label = generate_random_label(src);
+
+
+		printf("Eticheta generata pentru imagine: %d\n ", label);
+		waitKey();
+	}
+
+	return 0;
+}
+
+double calculate_accuracy(const std::vector<image>& vec1, const std::vector<image>& vec2) {
+	if (vec1.size() != vec2.size() || vec1.empty()) {
+		printf("Eroare: Listele de etichete au lungimi diferite.\n");
+		return -7.0;
+	}
+
+	int ok_count = 0;
+	int total_count = vec1.size();
+
+	for (size_t i = 0; i < vec1.size(); i++) {
+		if (vec1[i].tag == vec2[i].tag) {
+			ok_count++;
+		}
+	}
+
+	if (total_count == 0) {
+		printf("Eroare: Numarul total de imagini este zero.\n");
+		return -1.0;
+	}
+
+	double accuracy = static_cast<double>(ok_count) / total_count;
+
+	return accuracy;
+}
+
+double test_vec(std::vector<image>& true_tag) {
+
+	std::vector<image> generated_tag;
+	for (int i = 0; i < true_tag.size(); i++) {
+		image img;
+		img.mat = true_tag[i].mat;
+		img.tag = generate_random_label(img.mat);
+		generated_tag.push_back(img);
+	}
+	return calculate_accuracy(true_tag, generated_tag);
+}
 
 
 int main()
@@ -634,6 +715,9 @@ int main()
 
 	cv::utils::logging::setLogLevel(cv::utils::logging::LOG_LEVEL_FATAL);
 	projectPath = _wgetcwd(0, 0);
+
+	FILE* file = fopen("poze.txt", "w");
+	fclose(file);
 
 	int op;
 	do
@@ -653,7 +737,9 @@ int main()
 		printf(" 10 - Edges in a video sequence\n");
 		printf(" 11 - Snap frame from live video\n");
 		printf(" 12 - Mouse callback demo\n");
-		printf(" 13 - Open\n");
+		printf(" 13 - Batch Open\n");
+		printf(" 14 - Test generare etichete imagine random\n");
+		printf(" 15 - Accuracy\n");
 		printf(" 0 - Exit\n\n");
 
 		printf("Option: ");
@@ -699,11 +785,30 @@ int main()
 			break;
 		case 13:
 			batchOpen(getenv("PI_Images"));
-			FILE* file = fopen("poze.txt", "w");
-			fprintf(file, "Numarul de poze la care am dat tag:%d\n", count);
+			{
+				FILE* file = fopen("poze.txt", "w");
+				fprintf(file, "Numarul de poze la care am dat tag:%d\n", count);
+				fclose(file);
+			}
+			break;
+		case 14:
+			//test_generare_random();
+			{
+				FILE* file = fopen("poze.txt", "a");
+				fprintf(file, "Acuratetea : %lf\n", calculate_accuracy(train_images, train_images));
+				fclose(file);
+			}
+			break;
+		case 15:
+			batchOpen(getenv("PI_Images"));
+			{
+
+				FILE* file = fopen("poze.txt", "a");
+				fprintf(file, "accuracyRandom: %lf\n", test_vec(train_images));
+				fclose(file);
+			}
 			break;
 		}
-
 	} while (op != 0);
 	return 0;
 }
