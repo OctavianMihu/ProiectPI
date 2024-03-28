@@ -1,1 +1,5 @@
+accuracyRandom: 0.248369
+accuracyRandom: 0.254361
+accuracyRandom: 0.247170
 accuracyRandom: 0.258889
+accuracyRandom: 0.251964

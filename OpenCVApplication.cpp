@@ -417,6 +417,7 @@ hist_height - height of the histogram image
 Call example:
 showHistogram ("MyHist", hist_dir, 255, 200);
 */
+
 void showHistogram(const std::string& name, int* hist, const int  hist_cols, const int hist_height)
 {
 
@@ -551,8 +552,7 @@ int count = 0;
 std::vector<image> test_images;
 std::vector<image> train_images;
 
-std::vector<int> test_images_tag;
-std::vector<int> train_images_tag;
+
 
 void batchOpen(const TCHAR* dir)
 {
@@ -571,7 +571,6 @@ void batchOpen(const TCHAR* dir)
 		printf("Invalid handle value\n");
 		return;
 	}
-
 	do
 	{
 		if (_tcscmp(ffd.cFileName, TEXT(".")) != 0 && _tcscmp(ffd.cFileName, TEXT("..")) != 0)
@@ -613,12 +612,9 @@ void batchOpen(const TCHAR* dir)
 								}
 					if (strstr(dir, "test")) {
 						test_images.push_back(img);
-						test_images_tag.push_back(img.tag);
 					}
-					else {
-
+					else if(strstr(dir, "train")) {
 						train_images.push_back(img);
-						train_images_tag.push_back(img.tag);
 					}
 				}
 
@@ -689,9 +685,7 @@ double calculate_accuracy(const std::vector<image>& vec1, const std::vector<imag
 
 	return accuracy;
 }
-
-double test_vec(std::vector<image>& true_tag) {
-
+std::vector<image> gen_pred_tags(std::vector<image>& true_tag) {
 	std::vector<image> generated_tag;
 	for (int i = 0; i < true_tag.size(); i++) {
 		image img;
@@ -699,13 +693,77 @@ double test_vec(std::vector<image>& true_tag) {
 		img.tag = generate_random_label(img.mat);
 		generated_tag.push_back(img);
 	}
+	return generated_tag;
+}
+
+double test_vec(std::vector<image>& true_tag) {
+
+	std::vector<image> generated_tag = gen_pred_tags(true_tag);
+
 	return calculate_accuracy(true_tag, generated_tag);
 }
 
 
+void show_acc_table(std::vector<image> true_tag, std::vector<image> predicted_tag) {
+	int vect_size = true_tag.size();
+	int confusion[4][4] = { {0,0,0,0},
+							{0,0,0,0},
+							{0,0,0,0},	
+							{0,0,0,0}};
+	for (int i = 0; i < vect_size; i++) {
+		confusion[true_tag[i].tag][predicted_tag[i].tag] += 1;
+	}
+
+	printf("|-----------------------------------------------|\n");
+	printf("|\t   | clubs | diamonds | spades | hearts |\n");
+	printf("|----------|-------|----------|--------|--------|\n");
+	for (int i = 0; i < 4; i++) {
+		printf("|");
+		switch (i)
+		{
+		case 0: 
+			printf("   clubs  |");
+			break;
+
+		case 1:
+			printf(" diamonds |");
+			break;
+		case 2:
+			printf("  spades  |");
+			break;
+
+		case 3:
+			printf("  hearts  |");
+			break;
+		}
+		for (int j = 0; j < 4; j++) {
+			switch (j) {
+			case 0:
+				printf("  %d  |", confusion[i][j]);
+				break;
+			case 1:
+				printf("   %d    |", confusion[i][j]);
+				break;
+			case 2:
+				printf("  %d   |", confusion[i][j]);
+				break;
+			case 3:
+				printf("  %d   |", confusion[i][j]);
+				break;
+			}
+			
+		}
+		printf("\n");
+		printf("|----------|-------|----------|--------|--------|\n");
+	}
+	printf("");
+	waitKey(0);
+
+}
+bool opened = false;
 int main()
 {
-
+	srand((int)time(0));
 	/*const char* path = "C:\\Your\\Directory\\Path";
 	int counter = 0;
 	Directory directories[100]; // Assuming a maximum of 100 directories
@@ -740,6 +798,7 @@ int main()
 		printf(" 13 - Batch Open\n");
 		printf(" 14 - Test generare etichete imagine random\n");
 		printf(" 15 - Accuracy\n");
+		printf(" 16 - Histogram\n");
 		printf(" 0 - Exit\n\n");
 
 		printf("Option: ");
@@ -784,7 +843,10 @@ int main()
 			testMouseClick();
 			break;
 		case 13:
-			batchOpen(getenv("PI_Images"));
+			if (!opened) {
+				batchOpen(getenv("PI_Images"));
+				opened = true;
+			}
 			{
 				FILE* file = fopen("poze.txt", "w");
 				fprintf(file, "Numarul de poze la care am dat tag:%d\n", count);
@@ -793,22 +855,35 @@ int main()
 			break;
 		case 14:
 			//test_generare_random();
-			{
-				FILE* file = fopen("poze.txt", "a");
-				fprintf(file, "Acuratetea : %lf\n", calculate_accuracy(train_images, train_images));
-				fclose(file);
-			}
-			break;
+		{
+			FILE* file = fopen("poze.txt", "a");
+			fprintf(file, "Acuratetea : %lf\n", calculate_accuracy(train_images, train_images));
+			fclose(file);
+		}
+		break;
 		case 15:
-			batchOpen(getenv("PI_Images"));
+			if (!opened) {
+				batchOpen(getenv("PI_Images"));
+				opened = true;
+			}
 			{
-
 				FILE* file = fopen("poze.txt", "a");
 				fprintf(file, "accuracyRandom: %lf\n", test_vec(train_images));
 				fclose(file);
 			}
 			break;
+		case 16:
+			if (!opened){
+				opened = true;
+				batchOpen(getenv("PI_Images"));
+			}		
+			std::vector<image> gen = gen_pred_tags(train_images);
+			show_acc_table(train_images, gen);
+			int ok = scanf("%s");
+			break;
 		}
+
+
 	} while (op != 0);
 	return 0;
 }
